@@ -26,14 +26,9 @@ if (!$course) {
 }
 // Handle the form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // $errors =  $ad->updateCourse($_POST, $_FILES);
-    // if (empty($errors)) {
-    //     header("location: index.php");
-    //     exit;
-    // }
-    // header("location: register.php");
-    var_dump($_POST);
-    // exit;
+    $ad->updateRegister($_POST);
+    header("location: course.php?id=" . $_GET["id"]);
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -113,8 +108,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <td><?php echo strtoupper($register['nationality']); ?></td>
                         <td><?php echo $register["passport"]? $register["passport"] : 'N/A'; ?></td>
                         <td><?php echo $register["hotel"]? $register["hotel"] : 'N/A'; ?></td>
-                        <td style="width:10%"><input type="text" class="form-control" name="record_<?php echo $register["racebib"] . '_' . $register['course_id'] ?>" value="<?php echo $register["record"] ?? ''; ?>" style="width:100%"></td>
-                        <td style="width:10%"><input type="text" class="form-control" name="racebib_<?php echo $register["email"] . '_' . $register['course_id'] ?>" value="<?php echo $register["racebib"] ?? ''; ?>" style="width:100%"></td>
+                        <td style="width:10%"><input type="text" class="form-control" name="record_<?php echo explode('@', $register["email"])[0]; ?>" value="<?php echo $register["record"] ?? ''; ?>" style="width:100%"></td>
+                        <td style="width:10%"><input type="text" class="form-control" name="racebib_<?php echo explode('@', $register["email"])[0]; ?>" value="<?php echo $register["racebib"] ?? ''; ?>" style="width:100%"></td>
                         <td><?php echo $register["standing"] ?? 'N/A'; ?></td>
                     </tr>
                     <?php endforeach; ?>

@@ -46,7 +46,8 @@
                     <img src="images/2.png" class="card-img-top" alt="Danh sách đăng kí">
                     <div class="card-body">
                         <h5 class="card-title">Danh sách đăng kí</h5>
-                        <a href="search.php" class="btn btn-continue">Continue</a>
+                        <input type="email" class="form-control mb-3" id="email" placeholder="Enter your email">
+                        <a href="search.php" class="btn btn-continue" id="search">Continue</a>
                     </div>
                 </div>
             </div>
@@ -65,5 +66,18 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const search = document.getElementById("search");
+        const email = document.getElementById("email");
+        // Add event listener for email input
+        email.addEventListener("input", function() {
+            // Check if the email is valid
+            if (email.validity.valid) {
+                search.href = `search.php?email=${email.value}`;
+            } else {
+                search.href = "search.php";
+            }
+        });
+    </script>
 </body>
 </html>

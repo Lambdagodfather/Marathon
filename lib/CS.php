@@ -76,14 +76,14 @@ class CS {
             return $errors;
         }
         // Insert the data
-        $sql = "INSERT INTO register (course_id, name, email, birthdate,";
+        $sql = "INSERT INTO register (course_id, name, email, birthdate, nationality,";
         if (isset($data['passport']) && $data['passport'] != "") {
             $sql .= " passport,";
         }
         if (isset($data['hotel']) && $data['hotel'] != "") {
             $sql .= " hotel,";
         }
-        $sql .= " gender, phone, address) VALUES (" . $data["course_id"] . ", '" . $data["name"] . "', '" . $data["email"] . "', '" . $data["birthdate"] . "',";
+        $sql .= " gender, phone, address) VALUES (" . $data["course_id"] . ", '" . $data["name"] . "', '" . $data["email"] . "', '" . $data["birthdate"] . "', '" . $data['nationality'] . "',";
         if (isset($data['passport']) && $data['passport'] != "") {
             $sql .= " '" . $data["passport"] . "',";
         }
@@ -102,6 +102,17 @@ class CS {
     public function getInformation($email){
         $sql = "SELECT * FROM register WHERE email = '$email'";
         $result = $this->db->conn->query($sql);
+        if ($result->num_rows == 0) {
+            return false;
+        }
+        $result = $result->fetch_all(MYSQLI_ASSOC);
+        foreach ($result as $key => $row) {
+            $course_id = $row['course_id'];
+            $sql = "SELECT * FROM course WHERE id = $course_id";
+            $results = $this->db->conn->query($sql);
+            $course = $results->fetch_assoc();
+            $result[$key]['course'] = $course;
+        }
         return $result;
     }
 }

@@ -17,7 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
     // header("location: register.php");
-    var_dump($errors);
     // exit;
 }
 ?>

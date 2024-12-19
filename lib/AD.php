@@ -40,10 +40,6 @@ class AD {
             echo "File is not an image";
             return;
         }
-        if ($image["size"] > 500000) {
-            echo "File is too large";
-            return;
-        }
         if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
             echo "Only JPG, JPEG, PNG files are allowed";
             return;
@@ -89,6 +85,47 @@ class AD {
 
         return $course;
     }
+    // Validate update register
+    public function updateRegister($data) {
+        $course_id = $data["course_id"];
+        unset($data["course_id"]);
+        foreach ($data as $key => $value) {
+            // Split the key to get the email 
+            $email = explode("_", $key)[1];
+            $email = $email . "@gmail.com";
+            $update = explode("_", $key)[0];
+            if ($update == "record") {
+                $sql = "UPDATE register SET record = '$value' WHERE course_id = $course_id AND email = '$email'";
+                $result = $this->db->conn->query($sql);
+                if (!$result) {
+                    echo "Failed to update register";
+                    return;
+                }
+            } else if ($update == "racebib") {
+                $sql = "UPDATE register SET racebib = '$value' WHERE course_id = $course_id AND email = '$email'";
+                $result = $this->db->conn->query($sql);
+                if (!$result) {
+                    echo "Failed to update register";
+                    return;
+                }
+            }
+            // Sort the register
+            $this->sortRegister($course_id);
+            
+        }
+    }
+    // Sort register by record without null or 00:00:00
+    public function sortRegister($course_id) {
+        $sql = "SELECT * FROM register WHERE course_id = $course_id AND record IS NOT NULL AND record != '00:00:00' ORDER BY record";
+        $result = $this->db->conn->query($sql);
+        // Set the standing
+        $i = 1;
+        while ($register = $result->fetch_assoc()) {
+            $sql = "UPDATE register SET standing = $i WHERE course_id = $course_id AND email = '" . $register["email"] . "'";
+            $this->db->conn->query($sql);
+            $i++;
+        }
 
+    }
 }
 ?>

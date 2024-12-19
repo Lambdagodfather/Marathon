@@ -1,50 +1,138 @@
 <?php
-
-include 'connect.php';
-
-if(isset($_POST['signUp'])){
-    $firstName=$_POST['fName'];
-    $lastName=$_POST['lName'];
-    $email=$_POST['email'];
-    $password=$_POST['password'];
-    $password=md5($password);
-
-     $checkEmail="SELECT * From users where email='$email'";
-     $result=$conn->query($checkEmail);
-     if($result->num_rows>0){
-        echo "Email Address Already Exists !";
-     }
-     else{
-        $insertQuery="INSERT INTO users(firstName,lastName,email,password)
-                       VALUES ('$firstName','$lastName','$email','$password')";
-            if($conn->query($insertQuery)==TRUE){
-                header("location: index.php");
-            }
-            else{
-                echo "Error:".$conn->error;
-            }
-     }
-
-
-}
-
-if(isset($_POST['signIn'])){
-   $email=$_POST['email'];
-   $password=$_POST['password'];
-   $password=md5($password) ;
-
-   $sql="SELECT * FROM users WHERE email='$email' and password='$password'";
-   $result=$conn->query($sql);
-   if($result->num_rows>0){
-    session_start();
-    $row=$result->fetch_assoc();
-    $_SESSION['email']=$row['email'];
-    header("Location: homepage.php");
-    exit();
-   }
-   else{
-    echo "Not Found, Incorrect Email or Password";
-   }
-
+// Load all the required classes in /lib directory
+spl_autoload_register(function($class) {
+    include __DIR__ . "/lib/" . $class . '.php';
+});
+session_start();
+// Define CS class and DB class
+$cs = new CS();
+$db = new DB();
+// Get list of courses
+$courses = $cs->getCourses();
+// Handle the form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $errors =  $cs->register($_POST);
+    if (empty($errors)) {
+        header("location: index.php");
+        exit;
+    }
+    // header("location: register.php");
+    var_dump($errors);
+    // exit;
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('images/reg_back.png') no-repeat center center/cover;
+            height: 100vh;
+        }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .form-container {
+            position: relative;
+            z-index: 2;
+            max-width: 400px;
+            margin: auto;
+            margin-top: 5%;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+        .form-container h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .form-container h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .form-container input {
+            margin-bottom: 10px;
+            height: 40px;
+        }
+        .btn-register {
+            background-color: black;
+            color: white;
+            width: 100%;
+        }
+        .btn-register:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container form-container">
+        <h1>WELLCOME 😃</h1>
+        <h2>THÔNG TIN ĐĂNG KÝ</h2>
+        <form method="post" action="register.php">
+            <select class="form-select mb-3" name="course_id" required>
+            <option value="" disabled selected>Select Course</option>
+            <?php foreach ($courses as $course): ?>
+                <option value="<?php echo htmlspecialchars($course['id']); ?>">
+                <?php echo htmlspecialchars($course['name']); ?>
+                </option>
+            <?php endforeach; ?>
+            </select>
+            <input type="text" class="form-control" name="name" placeholder="FULL NAME" required>
+            <input type="email" class="form-control" name="email" placeholder="example@email.com" required>
+            <input type="date" class="form-control" name="birthdate" placeholder="Birthdate" required>
+            <input type="text" class="form-control" name="passport" placeholder="Passport">
+            <select class="form-select mb-3" name="gender" required>
+            <option value="" disabled selected>Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            </select> 
+            <select class="form-select mb-3" name="nationality" required>
+            <option value="" disabled selected>Select Nationality</option>
+            <option value="vn">Vietnam</option>
+            <option value="jp">Japan</option>
+            <option value="us">United States</option>
+            <option value="ca">Canada</option>
+            <option value="uk">United Kingdom</option>
+            <option value="au">Australia</option>
+            <option value="in">India</option>
+            <option value="cn">China</option>
+            <option value="de">Germany</option>
+            <option value="fr">France</option>
+            <option value="it">Italy</option>
+            <option value="es">Spain</option>
+            <option value="br">Brazil</option>
+            <option value="za">South Africa</option>
+            <option value="ng">Nigeria</option>
+            <option value="ru">Russia</option>
+            <option value="mx">Mexico</option>
+            <option value="kr">South Korea</option>
+            </select>
+            <input type="text" class="form-control" name="address" placeholder="Address" required>
+            <input type="text" class="form-control" name="phone" placeholder="Phone" required>
+            <input type="text" class="form-control" name="hotel" placeholder="Hotel">
+            <button type="submit" class="btn btn-register mt-3">Register</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
